@@ -11,8 +11,12 @@
 ## 🛠 Stack Tecnológica
 - **C# com .NET 8**
 - **Entity Framework Core** para persistência de dados
+- **SQL Server** para armazenamento de dados relacionais
+- **MongoDB** para armazenamento de dados não-relacionais
 - **JWT** para tokenização de usuários
 - **MediatR** para comunicação interna
+- **Quartz** para agendamento de jobs
+- **Fluent Validation** para validação de dados
 - **RabbitMQ** para broker de mensagens
 - **Docker** para containerização
 - **Swagger** para documentação da API
