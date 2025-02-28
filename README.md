@@ -1,44 +1,46 @@
-# 🏦 Cash Flow Control
+# 🏦 Controle de Fluxo de Caixa
 
-**Cash Flow Control** is a financial tracking system that helps merchants manage their daily cash flow with transaction logging (debits and credits) and a consolidated daily balance report.
+**Controle de Fluxo de Caixa** é um sistema de rastreamento financeiro que ajuda os comerciantes a gerenciar o fluxo de caixa diário com o registro de transações (débito e crédito) e um relatório consolidado diário de saldo.
 
-## 🚀 Features
-- **Transaction Management**: Create, list, and retrieve financial transactions.
-- **Daily Consolidation Service**: Processes and consolidates daily financial records asynchronously.
-- **Resilient Architecture**: Ensures the transaction service remains available even if the consolidation service fails.
-- **Scalability**: Handles up to 50 requests per second with a maximum 5% request loss.
+## 🚀 Funcionalidades
+- **Gestão de Transações**: Criar, listar e recuperar transações financeiras.
+- **Serviço de Consolidação Diária**: Processa e consolida registros financeiros diariamente de forma assíncrona.
+- **Arquitetura Resiliente**: Garante que o serviço de transações continue disponível mesmo que o serviço de consolidação falhe.
+- **Escalabilidade**: Suporta até 50 requisições por segundo com uma perda máxima de 5% nas requisições.
 
-## 🛠 Tech Stack
-- **C# with .NET 8**
-- **Entity Framework Core** for data persistence
-- **MediatR** for internal communication
-- **RabbitMQ or Apache Kafka** for async processing
-- **Docker & Docker Compose** for easy deployment
-- **Swagger** for API documentation
-- **xUnit/NUnit** for unit and integration testing
-- **Serilog** for structured logging
+## 🛠 Stack Tecnológica
+- **C# com .NET 8**
+- **Entity Framework Core** para persistência de dados
+- **JWT** para tokenização de usuários
+- **MediatR** para comunicação interna
+- **RabbitMQ** para broker de mensagens
+- **Docker** para containerização
+- **Swagger** para documentação da API
+- **xUnit** para testes unitários
+- **Serilog** para logging estruturado
 
-## 📦 Project Structure
+
+## 📖 Configuração e Uso (Dockerizado)
+
+### 1. Pré-requisitos
+Antes de executar o projeto, certifique-se de que você tenha o **Docker** instalado em sua máquina. Caso não tenha o Docker, você pode instalá-lo seguindo as instruções oficiais em: [Instalar o Docker](https://docs.docker.com/get-docker/).
+
+### 2. Clonar o Repositório
+Clone o repositório para sua máquina local:
 ```
-📦 CashFlowControl  
- ┣ 📂 src  
- ┃ ┣ 📂 LaunchesService (Transaction Service)  
- ┃ ┣ 📂 ConsolidationService (Daily Consolidation Service)  
- ┃ ┣ 📂 SharedKernel (Common domain logic)  
- ┃ ┗ 📂 Tests (Unit and integration tests)  
- ┣ 📜 README.md (Project documentation)  
- ┣ 📜 docker-compose.yml (Environment configuration)  
- ┗ 📜 CashFlowControl.sln (Solution file)  
+sh
+git clone https://github.com/Brand00wn/CashFlowControl.git
+cd cashflow-control
 ```
 
-## 📖 Setup & Usage
-1. Clone the repository:  
-   ```sh  
-   git clone https://github.com/Brand00wn/CashFlowControl.git
-   cd cashflow-control  
-   ```  
-2. Build and run the services using Docker:  
-   ```sh  
-   docker-compose up --build  
-   ```  
-3. Access the API documentation via Swagger at `http://localhost:5000/swagger`.
+### 3. Executar o Projeto com Docker Compose
+No diretório do projeto, basta executar o seguinte comando para iniciar o projeto junto com seus serviços dependentes (como banco de dados, RabbitMQ, etc.):
+```
+docker-compose up --build
+```
+
+### 4. Acessar a Aplicação
+A aplicação possui três APIs, para acessá-las, basta entrar nas URls relacionadas a cada módulo:
+-Autenticação (AuthenticationService - http://localhost:5001/swagger/index.html)
+-Lançamento de Vendas (LaunchService - http://localhost:5002/swagger/index.html)
+-Consolidação (ConsolidationService - http://localhost:5003/swagger/index.html)
