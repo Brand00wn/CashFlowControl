@@ -1,0 +1,87 @@
+version: "3.8"
+
+services:
+  authentication_service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: authentication_service
+    ports:
+      - "5001:5001"
+    depends_on:
+      - sqlserver
+      - rabbitmq
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=CashFlowControlDb;User Id=sa;Password=CfcAdmin123!;TrustServerCertificate=True
+      - RabbitMQ__Host=rabbitmq- ASPNETCORE_URLS=http://0.0.0.0:5001
+    entrypoint: ["dotnet", "/out/AuthenticationService.dll"]
+    networks:
+      - backend
+
+  launch_service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: launch_service
+    ports:
+      - "5002:5002"
+    depends_on:
+      - sqlserver
+      - rabbitmq
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=CashFlowControlDb;User Id=sa;Password=CfcAdmin123!;TrustServerCertificate=True
+      - RabbitMQ__Host=rabbitmq
+      - ASPNETCORE_URLS=http://0.0.0.0:5002
+    entrypoint: ["dotnet", "/out/LaunchService.dll"]
+    networks:
+      - backend
+
+  consolidation_service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: consolidation_service
+    ports:
+      - "5003:5003"
+    depends_on:
+      - mongodb
+      - rabbitmq
+    environment:
+      - MongoDB__ConnectionString=mongodb://mongodb:27017
+      - MongoDB__DatabaseName=ConsolidationDB
+      - RabbitMQ__Host=rabbitmq- ASPNETCORE_URLS=http://0.0.0.0:5003
+    entrypoint: ["dotnet", "/out/ConsolidationService.dll"]
+    networks:
+      - backend
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    environment:
+      SA_PASSWORD: "CfcAdmin123!"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"
+    networks:
+      - backend
+
+  mongodb:
+    image: mongo:6.0
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    networks:
+      - backend
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
