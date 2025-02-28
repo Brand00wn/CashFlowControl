@@ -151,3 +151,17 @@ A API de **Consolidação Diária** é responsável por processar e consolidar o
   - A resposta incluirá o total de créditos, débitos e o saldo final do dia.
 
 ---
+
+## 🔶➡️ Diagramas
+
+- **Desenho Arquitetural do Sistema**
+
+![Desenho Arquitetural do Sistema](./Documentation/SystemArchitectureDiagram.drawio.svg)
+
+---
+
+- **Fluxo de processos**
+
+![Fluxo de processos](./Documentation/FlowchartDiagram.drawio.svg)
+
+---
