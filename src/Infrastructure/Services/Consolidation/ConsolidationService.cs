@@ -4,6 +4,7 @@ using Domain.Entities.Consolidation;
 using Domain.Models.Launch.Launch;
 using Domain.DTOs.Consolidation;
 using Domain.DTOs.Launch;
+using Domain.DTOs;
 
 namespace Application.Authentication.Services;
 
@@ -71,5 +72,23 @@ public class ConsolidationService(
             TotalCreditAmount = c.TotalCreditAmount,
             TotalDebitAmount = c.TotalDebitAmount
         }).ToList();
+    }
+
+    public async Task<PaginatedResult<ConsolidationDTO>> GetPaginated(int pageNumber, int pageSize)
+    {
+        var consolidationsAll = await _repository.GetAllAsync();
+
+        var consolidationsPaginated = consolidationsAll.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+
+        var paginatedConsolidations = consolidationsPaginated.Select(p => new ConsolidationDTO
+        {
+            Id = p.Id,
+            Date = p.Date,
+            TotalAmount = p.TotalAmount,
+            TotalCreditAmount = p.TotalCreditAmount,
+            TotalDebitAmount = p.TotalDebitAmount
+        }).ToList();
+
+        return new PaginatedResult<ConsolidationDTO>(paginatedConsolidations, consolidationsAll.Count, pageSize, pageNumber);
     }
 }

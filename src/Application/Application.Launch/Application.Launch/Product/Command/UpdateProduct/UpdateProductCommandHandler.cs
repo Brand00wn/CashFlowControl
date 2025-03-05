@@ -3,7 +3,7 @@ using FluentValidation;
 using MediatR;
 using Services.Interfaces;
 
-namespace Application.Launch.Launch.Command.UpdateLaunch;
+namespace Application.Launch.Product.Command.UpdateProduct;
 public class UpdateProductCommandHandler(IProductService _service, IValidator<UpdateProductCommand> _validator) : IRequestHandler<UpdateProductCommand, ApiResponse>
 {
 

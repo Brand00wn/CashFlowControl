@@ -1,7 +1,7 @@
 ﻿using Domain.Models;
 using MediatR;
 
-namespace Application.Launch.Launch.Command.UpdateLaunch;
+namespace Application.Launch.Product.Command.UpdateProduct;
 public class UpdateProductCommand : IRequest<ApiResponse>
 {
     public int Id { get; set; }

@@ -1,6 +1,5 @@
 ﻿using Domain.Models;
 using MediatR;
-using Microsoft.AspNetCore.Identity;
 
 namespace Application.Authentication.Authentication.Command.Register;
 public class RegisterCommand : IRequest<ApiResponse>

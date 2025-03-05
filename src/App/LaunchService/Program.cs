@@ -11,12 +11,13 @@ using Quartz;
 using Serilog;
 using Infrastructure.Repositories.DependencyInjection;
 using Infrastructure.Services.DependencyInjection;
+using Application.Launch.Product.Command.CreateProduct;
 
 var builder = WebApplication.CreateBuilder(args);
 
 if (builder.Environment.IsProduction())
 {
-    builder.Configuration.AddJsonFile("/app/src/App/LaunchService/appsettings.json", optional: false, reloadOnChange: true);
+    builder.Configuration.AddJsonFile("/app/launchservice/appsettings.json", optional: false, reloadOnChange: true);
 
     builder.WebHost.ConfigureKestrel(options =>
     {
@@ -117,42 +118,44 @@ builder.Services.AddMassTransit(x =>
     });
 });
 
-#if(DEBUG)
-    builder.Services.AddQuartz(q =>
+builder.Services.AddQuartz(q =>
+{
+    var jobKey = new JobKey("DailyConsolidationJob");
+
+    q.AddJob<DailyConsolidationJob>(opts => opts.WithIdentity(jobKey));
+
+    var cronExpression = builder.Configuration["DailyConsolidationCronExpression"];
+
+    if (string.IsNullOrEmpty(cronExpression))
     {
-        var jobKey = new JobKey("DailyConsolidationJob");
+        throw new ArgumentException("DailyConsolidationCronExpression not found on config file.");
+    }
 
-        q.AddJob<DailyConsolidationJob>(opts => opts.WithIdentity(jobKey));
-        q.AddTrigger(opts => opts
-            .ForJob(jobKey)
-            .WithIdentity("DailyConsolidationTrigger")
-            .StartNow()
-            .WithSchedule(CronScheduleBuilder.DailyAtHourAndMinute(23, 59))
-        );
-    });
-#else
-    builder.Services.AddQuartz(q =>
-    {
-        var jobKey = new JobKey("DailyConsolidationJob");
-
-        q.AddJob<DailyConsolidationJob>(opts => opts.WithIdentity(jobKey));
-
-        q.AddTrigger(opts => opts
-            .ForJob(jobKey)
-            .WithIdentity("DailyConsolidationTrigger")
-            .StartNow()
-            .WithSimpleSchedule(x => x
-                .WithIntervalInMinutes(1)
-                .RepeatForever()
-            )
-        );
-    });
-#endif
+    q.AddTrigger(opts => opts
+        .ForJob(jobKey)
+        .WithIdentity("DailyConsolidationTrigger")
+        .StartNow()
+        .WithCronSchedule(cronExpression)
+    );
+});
 
 
 builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost")
+                  .AllowAnyMethod()
+                  .AllowAnyHeader();
+        });
+});
+
 var app = builder.Build();
+
+app.UseCors("AllowFrontend");
 
 using (var scope = app.Services.CreateScope())
 {

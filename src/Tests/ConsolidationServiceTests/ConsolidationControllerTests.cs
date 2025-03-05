@@ -5,6 +5,8 @@ using ConsolidationService.Controllers;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Domain.DTOs.Consolidation;
+using Application.Product.Product.Query.GetPaginatedConsolidations;
+using Domain.DTOs;
 
 namespace ConsolidationService.Tests
 {
@@ -62,6 +64,37 @@ namespace ConsolidationService.Tests
             var okResult = Assert.IsType<OkObjectResult>(result);
             var returnValue = Assert.IsAssignableFrom<List<ConsolidationDTO>>(okResult.Value);
             Assert.Empty(returnValue);
+        }
+
+        [Fact]
+        public async Task GetPaginated_ShouldReturnOkResult_WhenDataIsAvailable()
+        {
+            // Arrange
+            var mockResult = new PaginatedResult<ConsolidationDTO>(
+                new List<ConsolidationDTO>
+                {
+                    new ConsolidationDTO
+                    {
+                        Id = new Guid().ToString(),
+                        Date = DateTime.UtcNow,
+                        TotalAmount = 100,
+                        TotalCreditAmount = 50,
+                        TotalDebitAmount = 40
+                    }
+                },
+                100,
+                10,
+                1
+            );
+
+            _mediatorMock.Setup(m => m.Send(It.IsAny<GetPaginatedConsolidationsQuery>(), default))
+                .ReturnsAsync(mockResult);
+
+            // Act
+            var result = await _controller.GetPaginated(1, 10);
+
+            // Assert
+            Assert.IsType<OkObjectResult>(result);
         }
     }
 }

@@ -17,7 +17,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 if (builder.Environment.IsProduction())
 {
-    builder.Configuration.AddJsonFile("/app/src/App/AuthenticationService/appsettings.json", optional: false, reloadOnChange: true);
+    builder.Configuration.AddJsonFile("/app/authenticationservice/appsettings.json", optional: false, reloadOnChange: true);
 
     builder.WebHost.ConfigureKestrel(options =>
     {
@@ -105,7 +105,20 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddAuthenticationServices();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost")
+                  .AllowAnyMethod()
+                  .AllowAnyHeader();
+        });
+});
+
 var app = builder.Build();
+
+app.UseCors("AllowFrontend");
 
 app.UseSerilogRequestLogging();
 

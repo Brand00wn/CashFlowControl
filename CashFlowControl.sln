@@ -39,6 +39,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application.Launch", "src\A
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application.Consolidation", "src\Application\Application.Consolidation\Application.Consolidation\Application.Consolidation.csproj", "{1382A458-CC7A-449B-A51E-F8C4B1D9D86D}"
 EndProject
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "cashflowcontrol", "src\App\CashFlowControl\CashFlowControl\cashflowcontrol.esproj", "{8E6C73ED-3470-BFA6-B067-BDA73DEB9775}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -97,6 +99,12 @@ Global
 		{1382A458-CC7A-449B-A51E-F8C4B1D9D86D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1382A458-CC7A-449B-A51E-F8C4B1D9D86D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1382A458-CC7A-449B-A51E-F8C4B1D9D86D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E6C73ED-3470-BFA6-B067-BDA73DEB9775}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E6C73ED-3470-BFA6-B067-BDA73DEB9775}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E6C73ED-3470-BFA6-B067-BDA73DEB9775}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{8E6C73ED-3470-BFA6-B067-BDA73DEB9775}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E6C73ED-3470-BFA6-B067-BDA73DEB9775}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E6C73ED-3470-BFA6-B067-BDA73DEB9775}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -115,6 +123,7 @@ Global
 		{754CDC99-62D6-4169-B770-53B20B2ABAAC} = {C73E5993-1605-4E6C-95E9-0F1E7D6041E0}
 		{2C2576D0-DEFC-4A1D-83C7-CE226DAEDA99} = {33156D42-D197-4D54-B9C5-75A7135ACAEB}
 		{1382A458-CC7A-449B-A51E-F8C4B1D9D86D} = {33156D42-D197-4D54-B9C5-75A7135ACAEB}
+		{8E6C73ED-3470-BFA6-B067-BDA73DEB9775} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5A84DDC2-CADF-4B5A-9A9A-715C8D1178C5}
