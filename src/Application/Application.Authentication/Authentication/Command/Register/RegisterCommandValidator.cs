@@ -1,5 +1,4 @@
-﻿using Application.Authentication.Authentication.Command.Register;
-using FluentValidation;
+﻿using FluentValidation;
 
 namespace Application.Authentication.Authentication.Command.Register;
 public class RegisterCommandValidator : AbstractValidator<RegisterCommand>

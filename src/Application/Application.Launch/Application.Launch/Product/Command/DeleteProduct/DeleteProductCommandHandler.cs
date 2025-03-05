@@ -3,7 +3,7 @@ using FluentValidation;
 using MediatR;
 using Services.Interfaces;
 
-namespace Application.Launch.Launch.Command.DeleteLaunch;
+namespace Application.Launch.Product.Command.DeleteProduct;
 public class DeleteProductCommandHandler(IProductService _service, IValidator<DeleteProductCommand> _validator) : IRequestHandler<DeleteProductCommand, ApiResponse>
 {
 

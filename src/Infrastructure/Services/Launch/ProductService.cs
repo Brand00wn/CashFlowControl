@@ -5,6 +5,7 @@ using Domain.Entities.Launch;
 using Domain.Entities.Product;
 using Infrastructure.Repositories.UnitOfWork;
 using Domain.DTOs.Launch;
+using Domain.DTOs;
 
 namespace Application.Authentication.Services;
 
@@ -51,6 +52,35 @@ public class ProductService(IProductRepository _repository, IUnitOfWork _unitOfW
             Price = p.Price,
             Stock = p.Stock
         }).ToList();
+    }
+
+    public async Task<ProductDTO> GetById(int id)
+    {
+        var product = await _repository.GetByIdAsync(id);
+        return new ProductDTO
+        {
+            Id = product.Id,
+            Name = product.Name,
+            Price = product.Price,
+            Stock = product.Stock
+        };
+    }
+
+    public async Task<PaginatedResult<ProductDTO>> GetPaginated(int pageNumber, int pageSize)
+    {
+        var productsAll = await _repository.GetAllAsync();
+
+        var productsPaginated = productsAll.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+
+        var paginatedProducts = productsPaginated.Select(p => new ProductDTO
+        {
+            Id = p.Id,
+            Name = p.Name,
+            Price = p.Price,
+            Stock = p.Stock
+        }).ToList();
+
+        return new PaginatedResult<ProductDTO>(paginatedProducts, productsAll.Count, pageSize, pageNumber);
     }
 
     public async Task<ApiResponse> UpdateProduct(int id, string name, decimal price, int stock)

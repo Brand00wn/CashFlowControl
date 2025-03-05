@@ -1,7 +1,7 @@
 ﻿using Domain.Models;
 using MediatR;
 
-namespace Application.Launch.Launch.Command.CreateLaunch;
+namespace Application.Launch.Product.Command.CreateProduct;
 public class CreateProductCommand : IRequest<ApiResponse>
 {
     public string Name { get; set; } = string.Empty;

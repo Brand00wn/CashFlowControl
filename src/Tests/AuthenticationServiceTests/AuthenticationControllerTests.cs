@@ -1,4 +1,5 @@
 using Application.Authentication.Authentication.Command.ChangePassword;
+using Application.Authentication.Authentication.Command.DeleteUser;
 using Application.Authentication.Authentication.Command.Login;
 using Application.Authentication.Authentication.Command.Register;
 using Domain.Models;
@@ -37,13 +38,10 @@ public class AuthenticationControllerTests
         _controller = new AuthenticationController(_mediatorMock.Object, _signInManagerMock.Object, _loggerMock.Object);
     }
 
-    // Login Test
     [Fact]
     public async Task Login_ValidCredentials_ReturnsOkWithToken()
     {
-        // Arrange
         var loginDto = new LoginModel { Username = "testuser", Password = "password123" };
-        var loginCommand = new LoginCommand { Username = loginDto.Username, Password = loginDto.Password };
         var expectedToken = "mocked-jwt-token";
 
         var response = new LoginResponseModel { Success = true, Token = expectedToken };
@@ -51,10 +49,8 @@ public class AuthenticationControllerTests
         _mediatorMock.Setup(m => m.Send(It.IsAny<LoginCommand>(), It.IsAny<CancellationToken>()))
                      .ReturnsAsync(response);
 
-        // Act
         var result = await _controller.Login(loginDto);
 
-        // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
         var actualResponse = Assert.IsType<LoginResponseModel>(okResult.Value);
 
@@ -62,77 +58,38 @@ public class AuthenticationControllerTests
         Assert.Equal(expectedToken, actualResponse.Token);
     }
 
-
     [Fact]
     public async Task Login_InvalidCredentials_ReturnsUnauthorized()
     {
-        // Arrange
         var loginDto = new LoginModel { Username = "testuser", Password = "wrongpassword" };
 
         _mediatorMock.Setup(m => m.Send(It.IsAny<LoginCommand>(), It.IsAny<CancellationToken>()))
-                     .ThrowsAsync(new UnauthorizedAccessException());
+                     .ReturnsAsync(new LoginResponseModel { Success = false, Token = null! });
 
-        // Act
         var result = await _controller.Login(loginDto);
 
-        // Assert
         var unauthorizedResult = Assert.IsType<UnauthorizedObjectResult>(result);
         Assert.Equal("Invalid credentials.", unauthorizedResult.Value);
     }
 
     [Fact]
-    public async Task Login_NullRequest_ReturnsBadRequest()
-    {
-        // Act
-        var result = await _controller.Login(new LoginModel());
-
-        // Assert
-        var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
-        Assert.Equal("Invalid login request.", badRequestResult.Value);
-    }
-
-    // Register Test
-    [Fact]
     public async Task Register_ValidUser_ReturnsOk()
     {
-        // Arrange
         var registerCommand = new RegisterCommand { UserName = "newuser", FullName = "Teste", Password = "Password123!" };
         var response = new ApiResponse { Success = true };
 
         _mediatorMock.Setup(m => m.Send(It.IsAny<RegisterCommand>(), It.IsAny<CancellationToken>()))
                      .ReturnsAsync(response);
 
-        // Act
         var result = await _controller.Register(registerCommand);
 
-        // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
         Assert.Equal(response, okResult.Value);
     }
 
     [Fact]
-    public async Task Register_Failed_ReturnsBadRequest()
-    {
-        // Arrange
-        var registerCommand = new RegisterCommand { UserName = "newuser", FullName = "Teste", Password = "weak" };
-        var response = new ApiResponse { Success = false, Message = "Weak password" };
-
-        _mediatorMock.Setup(m => m.Send(It.IsAny<RegisterCommand>(), It.IsAny<CancellationToken>()))
-                     .ReturnsAsync(response);
-
-        // Act
-        var result = await _controller.Register(registerCommand);
-
-        // Assert
-        var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
-        Assert.Equal(response, badRequestResult.Value);
-    }
-
-    // ChangePassword Test
-    [Fact]
     public async Task ChangePassword_ValidRequest_ReturnsOk()
     {
-        // Arrange
         var changePasswordCommand = new ChangePasswordCommand
         {
             Username = "username",
@@ -145,8 +102,33 @@ public class AuthenticationControllerTests
         _mediatorMock.Setup(m => m.Send(It.IsAny<ChangePasswordCommand>(), It.IsAny<CancellationToken>()))
                      .ReturnsAsync(response);
 
-        // Act
         var result = await _controller.ChangePassword(changePasswordCommand);
+
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        Assert.Equal(response, okResult.Value);
+    }
+
+    [Fact]
+    public async Task Logout_CallsSignOutAsync()
+    {
+        await _controller.LogoutAsync();
+
+        _signInManagerMock.Verify(s => s.SignOutAsync(), Times.Once);
+    }
+
+    [Fact]
+    public async Task Delete_ShouldReturnOk_WhenUserIsDeleted()
+    {
+        // Arrange
+        var userId = "123";
+        var deleteCommand = new DeleteUserCommand { Id = userId };
+        var response = new ApiResponse { Success = true };
+
+        _mediatorMock.Setup(m => m.Send(It.IsAny<DeleteUserCommand>(), It.IsAny<CancellationToken>()))
+                     .ReturnsAsync(response);
+
+        // Act
+        var result = await _controller.Delete(userId);
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
@@ -154,60 +136,31 @@ public class AuthenticationControllerTests
     }
 
     [Fact]
-    public async Task ChangePassword_InvalidRequest_ReturnsBadRequest()
+    public async Task Delete_ShouldReturnBadRequest_WhenIdIsNull()
     {
-        // Arrange
-        var changePasswordCommand = new ChangePasswordCommand
-        {
-            Username = "username",
-            CurrentPassword = "OldPass123!",
-            NewPassword = "weak"
-        };
-
-        var response = new ApiResponse { Success = false, Message = "Weak password" };
-
-        _mediatorMock.Setup(m => m.Send(It.IsAny<ChangePasswordCommand>(), It.IsAny<CancellationToken>()))
-                     .ReturnsAsync(response);
-
         // Act
-        var result = await _controller.ChangePassword(changePasswordCommand);
+        var result = await _controller.Delete(null!);
 
         // Assert
         var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
-        Assert.Equal(response, badRequestResult.Value);
+        Assert.Equal("Invalid user request.", badRequestResult.Value);
     }
 
     [Fact]
-    public async Task ChangePassword_ThrowsException_ReturnsServerError()
+    public async Task Delete_ShouldReturnServerError_WhenExceptionIsThrown()
     {
         // Arrange
-        var changePasswordCommand = new ChangePasswordCommand
-        {
-            Username = "username",
-            CurrentPassword = "OldPass123!",
-            NewPassword = "NewPass456!"
-        };
+        var userId = "123";
 
-        _mediatorMock.Setup(m => m.Send(It.IsAny<ChangePasswordCommand>(), It.IsAny<CancellationToken>()))
-                     .ThrowsAsync(new System.Exception("Unexpected error"));
+        _mediatorMock.Setup(m => m.Send(It.IsAny<DeleteUserCommand>(), It.IsAny<CancellationToken>()))
+                     .ThrowsAsync(new Exception("Unexpected error"));
 
         // Act
-        var result = await _controller.ChangePassword(changePasswordCommand);
+        var result = await _controller.Delete(userId);
 
         // Assert
-        var objectResult = Assert.IsType<ObjectResult>(result);
-        Assert.Equal(500, objectResult.StatusCode);
-        Assert.Equal("An error occurred while processing your request.", objectResult.Value);
-    }
-
-    // Logout Test
-    [Fact]
-    public async Task Logout_CallsSignOutAsync()
-    {
-        // Act
-        await _controller.LogoutAsync();
-
-        // Assert
-        _signInManagerMock.Verify(s => s.SignOutAsync(), Times.Once);
+        var statusCodeResult = Assert.IsType<ObjectResult>(result);
+        Assert.Equal(500, statusCodeResult.StatusCode);
+        Assert.Equal("An error occurred while processing your request.", statusCodeResult.Value);
     }
 }

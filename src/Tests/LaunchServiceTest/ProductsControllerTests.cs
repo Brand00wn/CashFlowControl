@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using Application.Launch.Launch.Command.CreateLaunch;
-using Application.Launch.Launch.Command.DeleteLaunch;
-using Application.Launch.Launch.Command.UpdateLaunch;
-using Application.Product.Product.Query.GetAllProducts;
+using Application.Launch.Product.Query.GetAllProducts;
+using Application.Launch.Product.Query.GetPaginatedProducts;
+using Application.Launch.Product.Query.GetProductById;
+using Domain.DTOs;
+using Domain.DTOs.Launch;
 using Domain.Models;
 using Domain.Models.Launch.Product;
 using MediatR;
@@ -98,5 +97,76 @@ public class ProductControllerTests
         var result = await _controller.Delete(null);
 
         Assert.IsType<BadRequestObjectResult>(result);
+    }
+
+    [Fact]
+    public async Task GetByName_ShouldReturnOkResult_WhenProductsAreFound()
+    {
+        var mockResult = new List<ProductDTO>
+        {
+            new ProductDTO { Id = 1, Name = "Test Product", Price = 100 },
+            new ProductDTO { Id = 2, Name = "Another Product", Price = 150 }
+        };
+
+        _mediatorMock.Setup(m => m.Send(It.IsAny<GetAllProductsQuery>(), default))
+            .ReturnsAsync(mockResult);
+
+        string name = "Test";
+
+        var result = await _controller.GetByName(name);
+
+        Assert.IsType<OkObjectResult>(result);
+    }
+
+    [Fact]
+    public async Task GetPaginated_ShouldReturnOkResult_WhenDataIsAvailable()
+    {
+        var mockResult = new PaginatedResult<ProductDTO>(
+            new List<ProductDTO>
+            {
+                new ProductDTO { Id = 1, Name = "Test Product", Price = 100 }
+            },
+            100,
+            10,
+            1
+        );
+
+        _mediatorMock.Setup(m => m.Send(It.IsAny<GetPaginatedProductsQuery>(), default))
+            .ReturnsAsync(mockResult);
+
+        int pageNumber = 1;
+        int pageSize = 10;
+
+        var result = await _controller.GetPaginated(pageNumber, pageSize);
+
+        Assert.IsType<OkObjectResult>(result);
+    }
+
+    [Fact]
+    public async Task GetById_ShouldReturnOkResult_WhenProductIsFound()
+    {
+        var mockResult = new ProductDTO { Id = 1, Name = "Test Product", Price = 100 };
+
+        _mediatorMock.Setup(m => m.Send(It.IsAny<GetProductsByIdQuery>(), default))
+            .ReturnsAsync(mockResult);
+
+        int id = 1;
+
+        var result = await _controller.GetById(id);
+
+        Assert.IsType<OkObjectResult>(result);
+    }
+
+    [Fact]
+    public async Task GetById_ShouldReturnNotFound_WhenProductIsNotFound()
+    {
+        _mediatorMock.Setup(m => m.Send(It.IsAny<GetProductsByIdQuery>(), default))
+            .ReturnsAsync((ProductDTO)null!);
+
+        int id = 1;
+
+        var result = await _controller.GetById(id);
+
+        Assert.IsType<NotFoundObjectResult>(result);
     }
 }

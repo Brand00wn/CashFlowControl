@@ -1,7 +1,9 @@
-using Application.Launch.Launch.Command.CreateLaunch;
-using Application.Launch.Launch.Command.DeleteLaunch;
-using Application.Launch.Launch.Command.UpdateLaunch;
-using Application.Product.Product.Query.GetAllProducts;
+using Application.Launch.Product.Command.CreateProduct;
+using Application.Launch.Product.Command.DeleteProduct;
+using Application.Launch.Product.Command.UpdateProduct;
+using Application.Launch.Product.Query.GetAllProducts;
+using Application.Launch.Product.Query.GetPaginatedProducts;
+using Application.Launch.Product.Query.GetProductById;
 using Domain.Models.Launch.Product;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -63,6 +65,76 @@ public class ProductController : ControllerBase
             return StatusCode(500, "An error occurred while processing your request.");
         }
     }
+
+    [HttpGet("/api/Product/ByName/{name}")]
+    public async Task<IActionResult> GetByName(string name)
+    {
+        try
+        {
+            var result = await _mediator.Send(new GetAllProductsQuery());
+
+            var filteredProducts = result.Where(p => p.Name.Contains(name, StringComparison.OrdinalIgnoreCase)).ToList();
+
+            _logger.LogInformation($"Retrieved {filteredProducts.Count} products matching '{name}'.");
+
+            return Ok(filteredProducts);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"Failed to retrieve products. Error: {ex.Message}");
+            return StatusCode(500, "An error occurred while processing your request.");
+        }
+    }
+
+    [HttpGet("/api/Product/Paginated")]
+    public async Task<IActionResult> GetPaginated(int pageNumber = 1, int pageSize = 10)
+    {
+        try
+        {
+            var result = await _mediator.Send(new GetPaginatedProductsQuery { PageNumber = pageNumber, PageSize = pageSize });
+
+            _logger.LogInformation("Retrieved paginated products.");
+
+            return Ok(new
+            {
+                Total = result.TotalCount,
+                Products = result.Items,
+                result.PageSize,
+                result.PageNumber
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to retrieve products.");
+            return StatusCode(500, "An error occurred while processing your request.");
+        }
+    }
+
+    [HttpGet("/api/Product/{id}")]
+    public async Task<IActionResult> GetById(int id)
+    {
+        try
+        {
+            var result = await _mediator.Send(new GetProductsByIdQuery { Id = id });
+
+            if (result == null)
+            {
+                _logger.LogWarning($"Product with ID {id} not found.");
+                return NotFound(new { Message = "Product not found." });
+            }
+
+            _logger.LogInformation($"Retrieved product {result.Name}.");
+
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to retrieve product.");
+            return StatusCode(500, "An error occurred while processing your request.");
+        }
+    }
+
+
 
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, [FromBody] ProductModel product)

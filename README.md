@@ -22,6 +22,7 @@
 - **Swagger** para documentação da API
 - **xUnit** para testes unitários
 - **Serilog** para logging estruturado
+- **React** para o frontend
 
 
 ## 📖 Configuração e Uso (Dockerizado)
@@ -48,8 +49,22 @@ A aplicação possui três APIs, para acessá-las, basta entrar nas URls relacio
 - **Autenticação** (AuthenticationService - http://localhost:5001/swagger/index.html)
 - **Lançamento de Vendas** (LaunchService - http://localhost:5002/swagger/index.html)
 - **Consolidação** (ConsolidationService - http://localhost:5003/swagger/index.html)
+- **FrontEnd** (Cash Flow Control - http://localhost/)
 
-## 📝 Como Utilizar a Aplicação
+## 📝 Como Utilizar o frontend
+O frontend conta com telas de Login; Reset de Senhas; Lançamento de Vendas; Cadastro e Atualização de Produtos; Visualização de Consolidações e Gerenciamento de Usuários. 
+Abaixo as credenciais default de dois tipos de usuários diferentes (admin e regular)
+- **URL** http://localhost/login
+- **Credencial Admin** - user: **adminuser** pass: **CfcAdmin123!**
+- **Credencial User** - user: **regularuser** pass: **CfcUser123!**
+
+### **Fluxo de Funcionamento**
+1. Login
+2. Cadastro de Produtos
+3. Lançamento de Vendas
+4. Consolidação (Obs.: A consolidação ocorre por agendamento por meio de uma cronExpression que está armazenada no appSettings do LaunchService. Atualmente está para rodar todos os dias às 23:59 hrs)
+
+## 📝 Como Utilizar a API (Caso queira usar outro frontend/postman)
 
 ### 1. **Autenticação & Autorização**
 

@@ -9,6 +9,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Logging;
 using Services.Interfaces;
+using Domain.DTOs;
+using Azure.Core;
+using System.Threading;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Authentication.Services;
 
@@ -44,10 +48,21 @@ public class AuthService(UserManager<ApplicationUserModel> _userManager,
 
         if (result.Succeeded)
         {
+            var roleResult = await _userManager.AddToRoleAsync(user, "user");
+
+            if (!roleResult.Succeeded)
+            {
+                return new ApiResponse
+                {
+                    Success = false,
+                    Message = string.Join(", ", roleResult.Errors.Select(e => e.Description))
+                };
+            }
+
             return new ApiResponse
             {
                 Success = true,
-                Message = "User successfully registered."
+                Message = "User successfully registered and role assigned."
             };
         }
 
@@ -57,6 +72,7 @@ public class AuthService(UserManager<ApplicationUserModel> _userManager,
             Message = string.Join(", ", result.Errors.Select(e => e.Description))
         };
     }
+
 
     public async Task<ApiResponse> ChangePassword(string username, string currentPassword, string newPassword, CancellationToken cancellationToken)
     {
@@ -87,6 +103,60 @@ public class AuthService(UserManager<ApplicationUserModel> _userManager,
             Message = string.Join(", ", result.Errors.Select(e => e.Description))
         };
     }
+
+    public async Task<PaginatedResult<ApplicationUserModel>> GetPaginatedUsers(int pageNumber, int pageSize, CancellationToken cancellationToken)
+    {
+        var users = await _userManager.Users
+        .Skip((pageNumber - 1) * pageSize)
+        .Take(pageSize)
+            .ToListAsync(cancellationToken);
+
+        return new PaginatedResult<ApplicationUserModel>(users, await _userManager.Users.CountAsync(), pageSize, pageNumber);
+    }
+
+    public async Task<ApiResponse> DeleteUser(string id)
+    {
+        try
+        {
+            var user = await _userManager.FindByIdAsync(id);
+
+            if (user == null)
+            {
+                return new ApiResponse
+                {
+                    Success = false,
+                    Message = "User not found."
+                };
+            }
+
+            var result = await _userManager.DeleteAsync(user);
+
+            if (result.Succeeded)
+            {
+                return new ApiResponse
+                {
+                    Success = true,
+                    Message = $"User {user.UserName} successfully deleted."
+                };
+            }
+
+            return new ApiResponse
+            {
+                Success = false,
+                Message = string.Join(", ", result.Errors.Select(e => e.Description))
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"Error deleting user with ID {id}: {ex.Message}");
+            return new ApiResponse
+            {
+                Success = false,
+                Message = "An error occurred while deleting the user."
+            };
+        }
+    }
+
 
     private string GenerateJwtToken(ApplicationUserModel user)
     {

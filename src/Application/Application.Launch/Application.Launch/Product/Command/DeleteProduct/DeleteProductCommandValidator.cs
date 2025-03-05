@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace Application.Launch.Launch.Command.DeleteLaunch;
+namespace Application.Launch.Product.Command.DeleteProduct;
 public class DeleteProductCommandValidator : AbstractValidator<DeleteProductCommand>
 {
     public DeleteProductCommandValidator()

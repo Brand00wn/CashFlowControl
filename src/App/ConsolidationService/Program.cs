@@ -17,7 +17,7 @@ var mongoSettings = new MongoDbSettings();
 
 if (builder.Environment.IsProduction())
 {
-    builder.Configuration.AddJsonFile("/app/src/App/ConsolidationService/appsettings.json", optional: false, reloadOnChange: true);
+    builder.Configuration.AddJsonFile("/app/consolidationservice/appsettings.json", optional: false, reloadOnChange: true);
 
     builder.WebHost.ConfigureKestrel(options =>
     {
@@ -131,7 +131,20 @@ builder.Services.AddMassTransit(x =>
     });
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost")
+                  .AllowAnyMethod()
+                  .AllowAnyHeader();
+        });
+});
+
 var app = builder.Build();
+
+app.UseCors("AllowFrontend");
 
 app.UseSwagger();
 app.UseSwaggerUI();

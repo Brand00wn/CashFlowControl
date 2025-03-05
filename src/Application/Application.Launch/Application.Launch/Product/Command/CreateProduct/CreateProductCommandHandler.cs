@@ -3,7 +3,7 @@ using FluentValidation;
 using MediatR;
 using Services.Interfaces;
 
-namespace Application.Launch.Launch.Command.CreateLaunch;
+namespace Application.Launch.Product.Command.CreateProduct;
 public class CreateProductCommandHandler(IProductService _service, IValidator<CreateProductCommand> _validator) : IRequestHandler<CreateProductCommand, ApiResponse>
 {
 
