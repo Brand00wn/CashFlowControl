@@ -41,7 +41,7 @@ public class AuthenticationControllerTests
     [Fact]
     public async Task Login_ValidCredentials_ReturnsOkWithToken()
     {
-        var loginDto = new LoginModel { Username = "testuser", Password = "password123" };
+        var loginDto = new LoginModel { Username = "testuser", Password = "password" };
         var expectedToken = "mocked-jwt-token";
 
         var response = new LoginResponseModel { Success = true, Token = expectedToken };

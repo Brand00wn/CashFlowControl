@@ -48,7 +48,7 @@ public class AuthenticationController : ControllerBase
                 return Unauthorized("Invalid credentials.");
             }
 
-            _logger.LogDebug($"User {login.Username} logged in successfully.");
+            _logger.LogDebug($"User {login.Username} logged.");
             return Ok(response);
         }
         catch (Exception ex)

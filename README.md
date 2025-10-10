@@ -2,7 +2,7 @@
 
 **Controle de Fluxo de Caixa** é um sistema de rastreamento financeiro que ajuda os comerciantes a gerenciar o fluxo de caixa diário com o registro de transações (débito e crédito) e um relatório consolidado diário de saldo.
 
-## 🚀 Funcionalidades
+## 🚀 Funcionalidade
 - **Gestão de Transações**: Criar, listar e recuperar transações financeiras.
 - **Serviço de Consolidação Diária**: Processa e consolida registros financeiros diariamente de forma assíncrona.
 - **Arquitetura Resiliente**: Garante que o serviço de transações continue disponível mesmo que o serviço de consolidação falhe.
