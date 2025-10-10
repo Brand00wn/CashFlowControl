@@ -124,7 +124,7 @@ public class ProductControllerTests
         var mockResult = new PaginatedResult<ProductDTO>(
             new List<ProductDTO>
             {
-                new ProductDTO { Id = 1, Name = "Test Product", Price = 100 }
+                new ProductDTO { Id = 1, Name = "Test", Price = 100 }
             },
             100,
             10,
